@@ -7,13 +7,11 @@ import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
-import java.io.File
-
 
 fun main() {
     println("Hello!")
-    val config: Config? = setConfig("environment.json")
-    startBot(config!!.token)
+    val token: String = System.getenv("BOT_TOKEN") ?: throw Exception("BOT_TOKEN environment variable required")
+    startBot(token)
 }
 
 
