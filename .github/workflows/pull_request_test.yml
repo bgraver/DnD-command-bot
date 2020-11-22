@@ -1,0 +1,19 @@
+name: Pull Request Verification
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  gradle_build_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Tests
+        run: ./gradlew test --no-daemon
+  docker_build_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Container
+        run: docker build -t test-container .
