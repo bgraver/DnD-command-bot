@@ -21,10 +21,11 @@ class InfoCommand(val event:MessageReceivedEvent): DiscordCommand(event) {
         !info: shows info about the commands
       """.trimIndent(), false)
       .addField("Rolling", """
-        !roll <1>d<2> <modifier> (Example: [!roll 1d20 +6] rolls 1 20 sided die, with a modifier of +6)
-            -> <1> is the number of dice you'd like to roll
-            -> <2> the max number of the roll
-            -> <modifier> the modifier for the roll
+        !roll <1>d<2> <modifier>
+            - (Example: [!roll 1d20 +6] rolls 1 20 sided die, with a modifier of +6)
+            - <1> is the number of dice you'd like to roll
+            - <2> the max number of the roll
+            - <modifier> the modifier for the roll
       """.trimIndent(), false)
       .build()
   }
