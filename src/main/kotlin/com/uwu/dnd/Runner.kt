@@ -1,5 +1,6 @@
 package com.uwu.dnd
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.uwu.dnd.commands.InfoCommand
 import com.uwu.dnd.commands.RollCommand
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
@@ -30,12 +31,27 @@ class MessageListener: ListenerAdapter() {
 
     val msg = message.contentDisplay
 
-    val words = msg.split(" ")
+    if (!author.isBot) {
+      val words = msg.split(" ")
 
-    val command = when (words[0]) {
-      "!roll" -> RollCommand(event)
-      else -> return
+      val command = when (words[0]) {
+        "!roll" -> RollCommand(event)
+        "!info" -> InfoCommand(event)
+        else -> return
+      }
+
+      event.channel.sendTyping()
+        .queue{
+          if (command.validate()) {
+            command.execute()
+          }
+          else
+          {
+            println("Invalid input")
+          }
+        }
     }
+
   }
 }
 
