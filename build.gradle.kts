@@ -3,6 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     application
     kotlin("jvm") version "1.4.10"
+    kotlin("plugin.serialization") version "1.4.10"
     id("com.github.johnrengelman.shadow") version "5.1.0"
 }
 
@@ -20,18 +21,22 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
     implementation("net.dv8tion:JDA:4.2.0_204")
     implementation("org.litote.kmongo:kmongo:4.1.2")
     implementation("org.slf4j:slf4j-simple:1.7.30")
-  testImplementation("org.testng:testng:7.3.0")
+    testImplementation("org.testng:testng:7.3.0")
 }
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
+    }
+    test {
+        useTestNG()
     }
 }
 
