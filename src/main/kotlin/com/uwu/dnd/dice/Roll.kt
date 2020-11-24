@@ -23,7 +23,7 @@ data class Roll(
         val diceRoll = (1..numberOfDice).map {
             Random.nextInt(1..numberOfSides)
         }.sum()
-        val modifiersString =  modifiers.map { (t, u) -> if (t != Modifier.RAW) "$t($u)" else "($u)" }
+        val modifiersString = modifiers.map { (t, u) -> if (t != Modifier.RAW) "$t($u)" else "($u)" }
 
         return "$diceRoll+${modifiersString.joinToString("+") { it }}=${diceRoll + modifiers.values.sum()}"
     }
@@ -44,16 +44,17 @@ data class Roll(
                     groups[2]?.value?.toInt()!!,
                     groups[3]?.value?.split("+")?.filter { it.isNotBlank() }?.map {
                         translateModifierToInt(it)
-                    }?.toMap() ?: error("Regex was not processed properly")
+                    }?.toMap() ?: error("Regex was not processed properly with groups: '$groups'")
                 )
             }.toList()
         }
 
         private fun translateModifierToInt(s: String): Pair<Modifier, Int> {
-          return if (Modifier.values().map { it.name }.contains(s))
-                Modifier.valueOf(s) to 0
-            else
-                Modifier.RAW to (s.toIntOrNull() ?: 0)
+            return when {
+                Modifier.values().any { it.name == s } -> Modifier.valueOf(s) to 0
+                Modifier.values().any { it.short == s } -> Modifier.values().find { it.short == s }!! to 0
+                else -> Modifier.RAW to (s.toIntOrNull() ?: 0)
+            }
         }
     }
 
