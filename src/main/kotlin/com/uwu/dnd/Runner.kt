@@ -7,6 +7,10 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+private val logger: Logger = LoggerFactory.getLogger("MainClass")
 
 fun main() {
     val token: String = System.getenv("BOT_TOKEN") ?: throw Exception("BOT_TOKEN environment variable required")
@@ -23,28 +27,29 @@ fun startBot(token: String): JDA {
 
 class MessageListener : ListenerAdapter() {
     override fun onMessageReceived(event: MessageReceivedEvent) {
-        val author = event.author
-        val message = event.message
-        val channel = event.channel
+        try {
+            val author = event.author
+            val message = event.message
 
-        val msg = message.contentDisplay
+            val msg = message.contentDisplay
 
-        if (!author.isBot) {
-            val words = msg.split(" ")
+            if (!author.isBot) {
+                val words = msg.split("\\s+".toRegex())
 
-            val command = when (words[0]) {
-                "!roll" -> RollCommand(event)
-                "!info" -> InfoCommand(event)
-                else -> TextParseCommand(event)
+                val command = when (words[0]) {
+                    "!roll" -> RollCommand(event)
+                    "!info" -> InfoCommand(event)
+                    else -> TextParseCommand(event)
+                }
+                if (command.validate()) {
+                    command.execute()
+                } else {
+                    logger.error("Message is invalid '$msg'")
+                }
             }
-            if (command.validate()) {
-                command.execute()
-            } else {
-                println("Invalid input")
-            }
-
+        } catch (e: Exception) {
+            logger.error("Handling of message '${event.message.contentRaw}' failed with error ${e.stackTrace}")
         }
-
     }
 }
 

@@ -59,4 +59,24 @@ class RollTest {
             Roll(1, 10, mapOf(Modifier.RAW to 22))
         )
     }
+
+    @Test
+    fun testRawSubtraction() {
+        val roll = Roll.parseFromString("Rolling for damage: [1d10-1]")
+
+        assertEquals(
+            roll.first(),
+            Roll(1, 10, mapOf(Modifier.RAW to -1))
+        )
+    }
+
+//    @Test
+//    fun testRawSubtractionAlternateSyntax() {
+//        val roll = Roll.parseFromString("Rolling for damage: [1d10+-1]")
+//
+//        assertEquals(
+//            roll.first(),
+//            Roll(1, 10, mapOf(Modifier.RAW to -1))
+//        )
+//    }
 }

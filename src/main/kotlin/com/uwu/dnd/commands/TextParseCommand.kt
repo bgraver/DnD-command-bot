@@ -8,7 +8,7 @@ class TextParseCommand(event: MessageReceivedEvent) : DiscordCommand(event) {
     override fun execute() {
         val rolls = Roll.parseFromString(event.message.contentRaw)
             .mapIndexed { index, roll ->
-                "Roll #$index: ${roll.getResultString()}\n"
+                "Roll #${index + 1}: ${roll.getResultString()}\n"
             }.joinToString { it }
 
         if (rolls.isNotBlank()) {

@@ -2,6 +2,8 @@ package com.uwu.dnd.dice
 
 import com.uwu.dnd.character.Modifier
 import kotlinx.serialization.Serializable
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -12,6 +14,7 @@ data class Roll(
     private val modifiers: Map<Modifier, Int>
 ) {
 
+    private val logger: Logger = LoggerFactory.getLogger(Roll::class.java)
 
     fun getResult(): Int {
         return (1..numberOfDice).map {
@@ -31,7 +34,7 @@ data class Roll(
 
     companion object {
         private val rollRegex =
-            Regex("\\[(\\d+)d(\\d+)((\\+(STRENGTH|DEXTERITY|CONSTITUTION|INTELLIGENCE|WISDOM|CHARISMA|\\d+))*)\\]")
+            Regex("\\[(\\d+)d(\\d+)(([\\+|\\-](STRENGTH|DEXTERITY|CONSTITUTION|INTELLIGENCE|WISDOM|CHARISMA|-?\\d+))*)\\]")
 
         fun parseFromString(s: String): List<Roll> {
             val matches = rollRegex.findAll(s)
@@ -42,18 +45,22 @@ data class Roll(
                 return@map Roll(
                     groups[1]?.value?.toInt()!!,
                     groups[2]?.value?.toInt()!!,
-                    groups[3]?.value?.split("+")?.filter { it.isNotBlank() }?.map {
-                        translateModifierToInt(it)
+                    groups[3]?.value?.split("[\\+|\\-]".toRegex())?.filter { it.isNotBlank() }?.map {
+                        translateModifierToInt(it, groups[3]!!.value.take(1))
                     }?.toMap() ?: error("Regex was not processed properly with groups: '$groups'")
                 )
             }.toList()
         }
 
-        private fun translateModifierToInt(s: String): Pair<Modifier, Int> {
+        private fun translateModifierToInt(s: String, plusOrMinus: String): Pair<Modifier, Int> {
             return when {
                 Modifier.values().any { it.name == s } -> Modifier.valueOf(s) to 0
                 Modifier.values().any { it.short == s } -> Modifier.values().find { it.short == s }!! to 0
-                else -> Modifier.RAW to (s.toIntOrNull() ?: 0)
+                else -> Modifier.RAW to (when (plusOrMinus) {
+                    "+" -> s.toIntOrNull()
+                    "-" -> s.toIntOrNull()?.unaryMinus()
+                    else -> error("Could not parse sign ")
+                } ?: error("Could not map '$s' to modifier pair"))
             }
         }
     }
