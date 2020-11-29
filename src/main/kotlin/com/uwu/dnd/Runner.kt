@@ -3,7 +3,7 @@ package com.uwu.dnd
 import com.uwu.dnd.commands.InfoCommand
 import com.uwu.dnd.commands.RollCommand
 import com.uwu.dnd.commands.TextParseCommand
-import com.uwu.dnd.exceptions.EnvironmentVariableNotFound
+import com.uwu.dnd.exceptions.EnvironmentVariableNotFoundException
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
@@ -15,7 +15,7 @@ private val logger: Logger = LoggerFactory.getLogger("MainClass")
 
 fun main() {
     val token: String = System.getenv("BOT_TOKEN")
-        ?: throw EnvironmentVariableNotFound("BOT_TOKEN")
+        ?: throw EnvironmentVariableNotFoundException("BOT_TOKEN")
     startBot(token)
 }
 
