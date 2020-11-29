@@ -1,9 +1,12 @@
 package com.uwu.dnd.dice
 
 import com.uwu.dnd.character.Modifier
+import com.uwu.dnd.exceptions.RegexParseException
 import kotlinx.serialization.Serializable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.text.ParseException
+import kotlin.jvm.Throws
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -36,6 +39,7 @@ data class Roll(
         private val rollRegex =
             Regex("\\[(\\d+)d(\\d+)(([\\+|\\-](STRENGTH|DEXTERITY|CONSTITUTION|INTELLIGENCE|WISDOM|CHARISMA|-?\\d+))*)\\]")
 
+        @Throws(RegexParseException::class)
         fun parseFromString(s: String): List<Roll> {
             val matches = rollRegex.findAll(s)
 
@@ -47,11 +51,12 @@ data class Roll(
                     groups[2]?.value?.toInt()!!,
                     groups[3]?.value?.split("[\\+|\\-]".toRegex())?.filter { it.isNotBlank() }?.map {
                         translateModifierToInt(it, groups[3]!!.value.take(1))
-                    }?.toMap() ?: error("Regex was not processed properly with groups: '$groups'")
+                    }?.toMap() ?: throw RegexParseException("Regex was not processed properly with groups: '$groups'")
                 )
             }.toList()
         }
 
+        @Throws(RegexParseException::class)
         private fun translateModifierToInt(s: String, plusOrMinus: String): Pair<Modifier, Int> {
             return when {
                 Modifier.values().any { it.name == s } -> Modifier.valueOf(s) to 0
@@ -59,8 +64,8 @@ data class Roll(
                 else -> Modifier.RAW to (when (plusOrMinus) {
                     "+" -> s.toIntOrNull()
                     "-" -> s.toIntOrNull()?.unaryMinus()
-                    else -> error("Could not parse sign ")
-                } ?: error("Could not map '$s' to modifier pair"))
+                    else -> throw RegexParseException("Could not parse sign ")
+                } ?: throw RegexParseException("Could not map '$s' to modifier pair"))
             }
         }
     }
